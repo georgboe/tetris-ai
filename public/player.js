@@ -2,14 +2,17 @@ class Player {
   constructor(canvas) {
     this.PIECE_POOL = 'OISZLJT';
     this.COLORS = [
-      null,
-      'yellow',
-      'cyan',
-      'red',
-      'green',
-      'orange',
-      'hotpink',
-      'purple'];
+      {color1: "#3cbcfc", color2: "#0058f8"}, // 0
+      {color1: "#b8f818", color2: "#00a800"}, // 1
+      {color1: "#f878f8", color2: "#d800cc"}, // 2
+      {color1: "#58d854", color2: "#0058f8"}, // 3
+      {color1: "#58f898", color2: "#e40058"}, // 4
+      {color1: "#6888fc", color2: "#58f898"}, // 5
+      {color1: "#7c7c7c", color2: "#f83800"}, // 6
+      {color1: "#a80020", color2: "#6844fc"}, // 7
+      {color1: "#f83800", color2: "#0058f8"}, // 8
+      {color1: "#fca044", color2: "#f83800"}, // 9
+    ];
     this.SIZE = 40;
 
     this.canvas = canvas;
@@ -146,27 +149,68 @@ class Player {
     this.position.y = val.y * this.SIZE; 
   }
 
+  drawSquare(x, y , width, height, val, color) {
+    var context = this.context;
+    var lineWidth = width / 8; 
+
+    // fill to white initially
+    context.fillStyle = "#fff";
+    context.fillRect(x, y, width, height);
+    
+    context.fillStyle = color.color2;
+    if (val == 1 || val == 2 || val == 7) {
+      context.fillRect(x+lineWidth, y, width-lineWidth-lineWidth, lineWidth);
+      context.fillRect(x+width-lineWidth-lineWidth, y, lineWidth, height-lineWidth);
+
+      context.fillRect(x, y+height-lineWidth-lineWidth, width-lineWidth, lineWidth);
+      context.fillRect(x, y+lineWidth, lineWidth, height-lineWidth-lineWidth);
+    } else {
+
+      if (val == 6 || val == 3) {
+        context.fillStyle = color.color2;
+      } else {
+        context.fillStyle = color.color1;
+      }
+      context.fillRect(x, y, width, height);
+
+      context.fillStyle = "#fff";
+      context.fillRect(x, y, lineWidth, lineWidth);
+      context.fillRect(x+lineWidth, y+lineWidth, lineWidth*2, lineWidth);
+      context.fillRect(x+lineWidth, y+lineWidth, lineWidth, lineWidth*2);
+    }
+    
+    // Do this for all
+    this.context.fillStyle = "#000";
+    context.fillRect(x, y+height-lineWidth, width-lineWidth, height-lineWidth);
+    context.fillRect(x+width-lineWidth, y, lineWidth, height);
+  }
+
   draw() {
     this.context.save();
+    let gameScore = parseInt(score.innerHTML);
+    var colorIndex = Math.floor((gameScore % 100) / 10);
+    var color = this.COLORS[colorIndex];
 
     this.piece.representation.forEach((arr, y) => {
       arr.forEach((val, x) => {
-        if (this.COLORS[val] !== null) {
+        if (val != 0) {
           this.context.fillStyle = this.COLORS[val];
           const rectX = this.position.x + x*this.SIZE;
           const rectY = this.position.y + y*this.SIZE;
-          this.context.fillRect(rectX, rectY, this.SIZE, this.SIZE);
+          //this.context.fillRect(rectX, rectY, this.SIZE, this.SIZE);
+          this.drawSquare(rectX, rectY, this.SIZE, this.SIZE, val, color);
         } 
       });
     });
 
     this.grid.grid.forEach((arr, y) => {
       arr.forEach((val, x) => {
-        if (this.COLORS[val] !== null) {
+        if (val != 0) {
           this.context.fillStyle = this.COLORS[val];
           const rectX = x*this.SIZE;
           const rectY = y*this.SIZE;
-          this.context.fillRect(rectX, rectY, this.SIZE, this.SIZE);
+          //this.context.fillRect(rectX, rectY, this.SIZE, this.SIZE);
+          this.drawSquare(rectX, rectY, this.SIZE, this.SIZE, val, color);
         } 
       });
     });
